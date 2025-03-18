@@ -1,94 +1,127 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
-import Image from "next/image"
+import Image from "next/image";
+import { useEffect } from "react";
 
-const partners = [
-  { id: 1, name: "Versailles", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 2, name: "London Eye", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 3, name: "Museum of the Future", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 4, name: "Water World", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 5, name: "Sydney Opera House", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 6, name: "Big Bus", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 7, name: "Merlin", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 8, name: "Warner Bros", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 9, name: "Ocean Park", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 10, name: "Disneyland", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 11, name: "Uffizi Gallery", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 12, name: "Belvedere", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 13, name: "Historic Royal Palaces", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 14, name: "Prado Museum", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 15, name: "English Heritage", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 16, name: "Colture", logo: "/placeholder.svg?height=60&width=120" },
-  { id: 17, name: "Royal Collection Trust", logo: "/placeholder.svg?height=60&width=120" },
-]
+import { motion, useAnimationControls } from "framer-motion";
 
-export default function PartnersSection() {
-  const row1Ref = useRef<HTMLDivElement>(null)
-  const row2Ref = useRef<HTMLDivElement>(null)
+import { cn } from "@/lib/utils";
 
-  useEffect(() => {
-    const animateScroll = () => {
-      if (row1Ref.current) {
-        row1Ref.current.scrollLeft += 1
-        if (row1Ref.current.scrollLeft >= row1Ref.current.scrollWidth / 2) {
-          row1Ref.current.scrollLeft = 0
-        }
-      }
+import { partners } from "@/components/data/constants/constants";
+import { Partner } from "@/components/data/types/types";
+import { Card } from "@/components/ui/card";
 
-      if (row2Ref.current) {
-        row2Ref.current.scrollLeft -= 1
-        if (row2Ref.current.scrollLeft <= 0) {
-          row2Ref.current.scrollLeft = row2Ref.current.scrollWidth / 2
-        }
-      }
-    }
-
-    const interval = setInterval(animateScroll, 30)
-    return () => clearInterval(interval)
-  }, [])
-
-  const firstHalf = partners.slice(0, Math.ceil(partners.length / 2))
-  const secondHalf = partners.slice(Math.ceil(partners.length / 2))
-
-  return (
-    <section className="py-16 px-4">
-      <div className="container mx-auto">
-        <h2 className="text-2xl font-bold mb-12 text-center">We have the best partners</h2>
-
-        <div className="overflow-hidden mb-8">
-          <div ref={row1Ref} className="flex gap-12 whitespace-nowrap" style={{ width: "200%" }}>
-            {[...firstHalf, ...firstHalf].map((partner, index) => (
-              <div key={`${partner.id}-${index}`} className="inline-block">
-                <Image
-                  src={partner.logo || "/placeholder.svg"}
-                  alt={partner.name}
-                  width={120}
-                  height={60}
-                  className="h-12 w-auto object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="overflow-hidden">
-          <div ref={row2Ref} className="flex gap-12 whitespace-nowrap" style={{ width: "200%" }}>
-            {[...secondHalf, ...secondHalf].map((partner, index) => (
-              <div key={`${partner.id}-${index}`} className="inline-block">
-                <Image
-                  src={partner.logo || "/placeholder.svg"}
-                  alt={partner.name}
-                  width={120}
-                  height={60}
-                  className="h-12 w-auto object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+interface PartnerRowProps {
+    partners: Partner[];
+    direction: "left" | "right";
+    speed?: number;
+    className?: string;
 }
 
+const PartnerRow = ({
+    partners,
+    direction,
+    speed = 40,
+    className,
+}: PartnerRowProps) => {
+    const controls = useAnimationControls();
+    const duration = partners.length * (100 / speed);
+
+    useEffect(() => {
+        controls.start({
+            x:
+                direction === "left"
+                    ? [0, -1 * partners.length * 240]
+                    : [-1 * partners.length * 240, 0],
+        });
+    }, [controls, direction, partners.length]);
+
+    return (
+        <div className={cn("relative w-full overflow-hidden py-4", className)}>
+            <motion.div
+                className="flex gap-16 whitespace-nowrap"
+                initial={{
+                    x: direction === "left" ? 0 : -1 * partners.length * 240,
+                }}
+                animate={controls}
+                transition={{
+                    duration,
+                    repeat: Infinity,
+                    ease: "linear",
+                    repeatType: "loop",
+                }}
+            >
+                {/* Duplicate the array to create a seamless loop */}
+                {[...partners, ...partners, ...partners].map(
+                    (partner, index) => (
+                        <motion.div
+                            key={`${partner.id}-${index}`}
+                            className="inline-block px-4"
+                            whileHover={{
+                                scale: 1.05,
+                                filter: "brightness(1.1)",
+                            }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <Card className="flex h-24 w-48 items-center justify-center border border-gray-200/10 bg-white/5 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:border-primary/20">
+                                <Image
+                                    src={partner.logo || "/placeholder.svg"}
+                                    alt={partner.name}
+                                    width={160}
+                                    height={80}
+                                    className="h-auto max-h-16 w-auto max-w-full object-contain transition-all"
+                                />
+                            </Card>
+                        </motion.div>
+                    ),
+                )}
+            </motion.div>
+        </div>
+    );
+};
+
+interface PartnersSectionProps {
+    title?: string;
+    animationSpeed?: number;
+    className?: string;
+}
+
+export default function PartnersSection({
+    title = "We have the best partners",
+    animationSpeed = 40,
+    className,
+}: PartnersSectionProps) {
+    const firstHalf = partners.slice(0, Math.ceil(partners.length / 2));
+    const secondHalf = partners.slice(Math.ceil(partners.length / 2));
+
+    return (
+        <section
+            className={cn(
+                "relative w-full overflow-hidden bg-gradient-to-b from-background/80 to-background py-16",
+                className,
+            )}
+        >
+            <div className="w-full">
+                <h2 className="mb-12 text-center text-3xl font-bold tracking-tight">
+                    {title}
+                    <div className="mx-auto mt-3 h-1 w-24 rounded-full bg-primary"></div>
+                </h2>
+
+                <div className="w-full space-y-12">
+                    <PartnerRow
+                        partners={firstHalf}
+                        direction="left"
+                        speed={animationSpeed}
+                        className="mb-8"
+                    />
+
+                    <PartnerRow
+                        partners={secondHalf}
+                        direction="right"
+                        speed={animationSpeed}
+                    />
+                </div>
+            </div>
+        </section>
+    );
+}

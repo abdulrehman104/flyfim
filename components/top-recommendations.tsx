@@ -1,174 +1,195 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Image from "next/image"
-import { ChevronLeft, ChevronRight, Star, Zap } from "lucide-react"
+import Image from "next/image";
+import { useState } from "react";
 
-const recommendations = [
-  {
-    id: 1,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Madrid",
-    title: "Royal Palace of Madrid Skip-the-Line Tickets",
-    rating: 4.6,
-    reviews: "8.5K",
-    price: "€16",
-    tag: "Instant confirmation",
-  },
-  {
-    id: 2,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Athens",
-    title: "Acropolis Parthenon Tickets with Audio Guide",
-    rating: 4.3,
-    reviews: "36.3K",
-    price: "€12.90",
-    tag: "",
-  },
-  {
-    id: 3,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "London",
-    title: "From London: Harry Potter™ Warner Bros. Studio Tickets with Coach Transfers",
-    rating: 4.4,
-    reviews: "8.6K",
-    price: "£103.55",
-    originalPrice: "£109",
-    discount: "Save up to 5%",
-    tag: "Instant confirmation",
-  },
-  {
-    id: 4,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Interlaken",
-    title: "From Interlaken: Jungfraujoch Top of Europe Round-Trip Train Tickets",
-    rating: 4.5,
-    reviews: "3K",
-    price: "CHF 233.80",
-    tag: "Instant confirmation",
-  },
-  {
-    id: 5,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Paris",
-    title: "Eiffel Tower: Summit or Second Floor Direct Access Ticket",
-    rating: 4.4,
-    reviews: "12.3K",
-    price: "€49",
-    tag: "Free cancellation",
-  },
-  {
-    id: 6,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Rome",
-    title: "Vatican Museums & Sistine Chapel Skip-the-Line Ticket",
-    rating: 4.7,
-    reviews: "25.1K",
-    price: "€24",
-    tag: "Instant confirmation",
-  },
-  {
-    id: 7,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Barcelona",
-    title: "Sagrada Familia: Fast Track Ticket with Tower Access",
-    rating: 4.8,
-    reviews: "15.7K",
-    price: "€45",
-    tag: "Free cancellation",
-  },
-  {
-    id: 8,
-    image: "/placeholder.svg?height=200&width=300",
-    location: "Dubai",
-    title: "Burj Khalifa: At the Top (Levels 124 & 125) Ticket",
-    rating: 4.5,
-    reviews: "18.2K",
-    price: "AED 169",
-    tag: "Instant confirmation",
-  },
-]
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight, Star, Zap } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+
+import { topRecommendationsData } from "./data/constants/constants";
 
 export default function TopRecommendations() {
-  const [startIndex, setStartIndex] = useState(0)
-  const cardsToShow = 4
+    const [startIndex, setStartIndex] = useState(0);
+    const cardsToShow = 4;
 
-  const nextSlide = () => {
-    setStartIndex((prevIndex) => (prevIndex + cardsToShow >= recommendations.length ? 0 : prevIndex + cardsToShow))
-  }
+    const nextSlide = () => {
+        setStartIndex((prevIndex) =>
+            prevIndex + cardsToShow >=
+            topRecommendationsData.recommendations.length
+                ? 0
+                : prevIndex + cardsToShow,
+        );
+    };
 
-  const prevSlide = () => {
-    setStartIndex((prevIndex) =>
-      prevIndex === 0 ? Math.max(0, recommendations.length - cardsToShow) : prevIndex - cardsToShow,
-    )
-  }
+    const prevSlide = () => {
+        setStartIndex((prevIndex) =>
+            prevIndex === 0
+                ? Math.max(
+                      0,
+                      topRecommendationsData.recommendations.length -
+                          cardsToShow,
+                  )
+                : prevIndex - cardsToShow,
+        );
+    };
 
-  const visibleCards = recommendations.slice(startIndex, startIndex + cardsToShow)
+    const visibleCards = topRecommendationsData.recommendations.slice(
+        startIndex,
+        startIndex + cardsToShow,
+    );
 
-  return (
-    <section className="py-12 px-4">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Headout's top recommendations</h2>
-          <div className="flex gap-2">
-            <button onClick={prevSlide} className="p-2 rounded-full border border-gray-300 hover:bg-gray-100">
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button onClick={nextSlide} className="p-2 rounded-full border border-gray-300 hover:bg-gray-100">
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {visibleCards.map((item) => (
-            <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-md">
-              <div className="relative">
-                <Image
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.title}
-                  width={300}
-                  height={200}
-                  className="w-full h-48 object-cover"
-                />
-                {item.tag && <div className="absolute top-2 left-2 bg-white text-xs px-2 py-1 rounded">{item.tag}</div>}
-              </div>
-              <div className="p-4">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm text-gray-600">{item.location}</span>
-                  {item.rating && (
-                    <div className="flex items-center">
-                      <Star className="h-4 w-4 fill-current text-pink-500" />
-                      <span className="text-sm ml-1">{item.rating}</span>
-                      <span className="text-xs text-gray-500 ml-1">({item.reviews})</span>
+    return (
+        <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="relative overflow-hidden px-4 py-12"
+        >
+            <div className="container mx-auto">
+                <motion.div
+                    className="mb-8 flex items-center justify-between"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
+                >
+                    <div className="space-y-2">
+                        <h2 className="text-2xl font-bold tracking-tight">
+                            {topRecommendationsData.title}
+                        </h2>
+                        <p className="text-sm text-muted-foreground">
+                            Discover our handpicked selection of top experiences
+                        </p>
                     </div>
-                  )}
-                </div>
-                <h3 className="font-medium text-base mb-3 line-clamp-2">{item.title}</h3>
-                <div className="mt-auto">
-                  {item.tag === "Instant confirmation" && (
-                    <div className="flex items-center text-xs text-gray-600 mb-1">
-                      <Zap className="h-3 w-3 mr-1" />
-                      <span>Instant confirmation</span>
+                    <div className="flex items-center gap-4">
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={prevSlide}
+                            className="h-10 w-10 rounded-full transition-all hover:scale-105"
+                        >
+                            <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={nextSlide}
+                            className="h-10 w-10 rounded-full transition-all hover:scale-105"
+                        >
+                            <ChevronRight className="h-5 w-5" />
+                        </Button>
                     </div>
-                  )}
-                  <div className="text-sm text-gray-500">from</div>
-                  <div className="flex items-center gap-2">
-                    {item.originalPrice && (
-                      <span className="text-sm line-through text-gray-500">{item.originalPrice}</span>
-                    )}
-                    <span className="text-lg font-bold">{item.price}</span>
-                    {item.discount && (
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">{item.discount}</span>
-                    )}
-                  </div>
+                </motion.div>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                    <AnimatePresence mode="wait">
+                        {visibleCards.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.9 }}
+                                transition={{
+                                    duration: 0.4,
+                                    delay: index * 0.1,
+                                    ease: "easeOut",
+                                }}
+                            >
+                                <Card className="group overflow-hidden border-none bg-white shadow-lg transition-all duration-300 hover:shadow-xl">
+                                    <div className="relative">
+                                        <div className="relative h-48 overflow-hidden">
+                                            <Image
+                                                src={
+                                                    item.image ||
+                                                    "/placeholder.svg"
+                                                }
+                                                alt={item.title}
+                                                fill
+                                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                                                priority={index < 2}
+                                            />
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                                        </div>
+                                        {item.tag && (
+                                            <Badge
+                                                variant="secondary"
+                                                className={cn(
+                                                    "absolute left-3 top-3 bg-white/90 backdrop-blur-sm",
+                                                    item.tag ===
+                                                        "Instant confirmation" &&
+                                                        "text-green-700",
+                                                    item.tag ===
+                                                        "Free cancellation" &&
+                                                        "text-blue-700",
+                                                )}
+                                            >
+                                                {item.tag ===
+                                                    "Instant confirmation" && (
+                                                    <Zap className="mr-1 h-3 w-3" />
+                                                )}
+                                                {item.tag}
+                                            </Badge>
+                                        )}
+                                    </div>
+                                    <CardContent className="space-y-3 p-4">
+                                        <div className="flex items-center justify-between">
+                                            <Badge
+                                                variant="outline"
+                                                className="border-none bg-blue-50 text-blue-700 hover:bg-blue-100"
+                                            >
+                                                {item.location}
+                                            </Badge>
+                                            {item.rating && (
+                                                <div className="flex items-center gap-1.5">
+                                                    <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                                                    <span className="font-medium">
+                                                        {item.rating}
+                                                    </span>
+                                                    <span className="text-sm text-muted-foreground">
+                                                        ({item.reviews})
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <h3 className="line-clamp-2 min-h-[2.5rem] text-base font-semibold">
+                                            {item.title}
+                                        </h3>
+                                        <div className="border-t pt-2">
+                                            <div className="text-sm text-muted-foreground">
+                                                from
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {item.originalPrice && (
+                                                    <span className="text-sm text-muted-foreground line-through">
+                                                        {item.originalPrice}
+                                                    </span>
+                                                )}
+                                                <span className="text-lg font-bold">
+                                                    {item.price}
+                                                </span>
+                                                {item.discount && (
+                                                    <Badge
+                                                        variant="secondary"
+                                                        className="bg-green-50 text-green-700 hover:bg-green-100"
+                                                    >
+                                                        {item.discount}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
-              </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
+        </motion.section>
+    );
 }
-

@@ -1,139 +1,158 @@
-"use client"
+"use client";
 
-import { useState, useRef } from "react"
-import { ChevronLeft, ChevronRight } from "lucide-react"
-import Link from "next/link"
+import Link from "next/link";
+import { useRef, useState } from "react";
 
-// Theme categories with icons
-const themeCategories = [
-  { id: "tickets", name: "Tickets", icon: "🎟️" },
-  { id: "tours", name: "Tours", icon: "🧭" },
-  { id: "transportation", name: "Transportation", icon: "🚌" },
-  { id: "travel-services", name: "Travel Services", icon: "✈️" },
-  { id: "cruises", name: "Cruises", icon: "🚢" },
-  { id: "food-drink", name: "Food & Drink", icon: "🍽️" },
-  { id: "entertainment", name: "Entertainment", icon: "🎭" },
-  { id: "adventure", name: "Adventure", icon: "🧗‍♂️" },
-  { id: "aerial-sightseeing", name: "Aerial Sightseeing", icon: "🚁" },
-  { id: "water-sports", name: "Water Sports", icon: "🏄‍♂️" },
-  { id: "nature-wildlife", name: "Nature & Wildlife", icon: "🦁" },
-  { id: "wellness", name: "Wellness", icon: "💆‍♀️" },
-  { id: "classes", name: "Classes", icon: "🎨" },
-]
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Subcategories for each theme
-const themeSubcategories: Record<string, string[]> = {
-  adventure: [
-    "Skydiving",
-    "Climbing",
-    "Outdoor Activities",
-    "Mountain Excursions",
-    "Skiing",
-    "Racing",
-    "Snowboarding",
-    "Go Karting",
-    "Bungee Jumping",
-    "Indoor Adventure",
-    "Sledding",
-    "Ziplining",
-    "Desert Safari",
-    "Snowshoeing",
-    "Quad Biking",
-    "Canyoning",
-  ],
-  tickets: ["Theme Parks", "Museums", "Attractions", "Shows", "Concerts", "Sporting Events"],
-  tours: ["City Tours", "Day Trips", "Walking Tours", "Private Tours", "Hop-On Hop-Off"],
-  transportation: ["Airport Transfers", "Car Rentals", "Train Tickets", "Ferry Tickets"],
-  cruises: ["Day Cruises", "Dinner Cruises", "Yacht Charters", "River Cruises"],
-  "food-drink": ["Food Tours", "Cooking Classes", "Wine Tastings", "Dining Experiences"],
-  entertainment: ["Shows", "Concerts", "Nightlife", "Comedy", "Theater"],
-  "aerial-sightseeing": ["Helicopter Tours", "Hot Air Balloon Rides", "Paragliding", "Skydiving"],
-  "water-sports": ["Surfing", "Kayaking", "Snorkeling", "Scuba Diving", "Jet Skiing"],
-  "nature-wildlife": ["Safaris", "Hiking", "Bird Watching", "National Parks"],
-  wellness: ["Spa", "Yoga", "Meditation", "Fitness"],
-  classes: ["Cooking", "Art", "Dance", "Photography"],
-  "travel-services": ["SIM Cards", "WiFi Rental", "Travel Insurance", "Luggage Storage"],
-}
+import { browseThemesData } from "./data/constants/constants";
+import { Button } from "./ui/button";
 
 export default function BrowseThemes() {
-  const [activeCategory, setActiveCategory] = useState("adventure")
-  const categoriesRef = useRef<HTMLDivElement>(null)
+    const [activeCategory, setActiveCategory] = useState("adventure");
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollLeft = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: -200, behavior: "smooth" })
-    }
-  }
+    const scrollLeft = () => {
+        if (scrollContainerRef.current) {
+            const scrollAmount = 300;
+            const currentScroll = scrollContainerRef.current.scrollLeft;
+            scrollContainerRef.current.scrollTo({
+                left: currentScroll - scrollAmount,
+                behavior: "smooth",
+            });
+        }
+    };
 
-  const scrollRight = () => {
-    if (categoriesRef.current) {
-      categoriesRef.current.scrollBy({ left: 200, behavior: "smooth" })
-    }
-  }
+    const scrollRight = () => {
+        if (scrollContainerRef.current) {
+            const scrollAmount = 300;
+            const currentScroll = scrollContainerRef.current.scrollLeft;
+            scrollContainerRef.current.scrollTo({
+                left: currentScroll + scrollAmount,
+                behavior: "smooth",
+            });
+        }
+    };
 
-  return (
-    <section className="py-12 px-4">
-      <div className="container mx-auto">
-        <h2 className="text-2xl font-bold mb-6">Browse by themes</h2>
+    return (
+        <section className="w-full py-12 md:py-16">
+            <div className="container px-4 md:px-6">
+                <div className="mb-6 flex items-center justify-between">
+                    <h2 className="text-2xl font-bold tracking-tight">
+                        Browse by themes
+                    </h2>
 
-        <div className="relative">
-          <div
-            ref={categoriesRef}
-            className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          >
-            {themeCategories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap ${
-                  activeCategory === category.id
-                    ? "bg-purple-100 text-purple-700 border-purple-300"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-              >
-                <span>{category.icon}</span>
-                <span>{category.name}</span>
-              </button>
-            ))}
-          </div>
+                    <div className="flex items-center space-x-2 rounded-full border border-gray-100 bg-gray-50 p-1 shadow-sm">
+                        <Button
+                            onClick={scrollLeft}
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 rounded-full transition-colors hover:bg-gray-100 hover:text-purple-700"
+                            aria-label="Scroll left"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
 
-          <button
-            onClick={scrollLeft}
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
+                        <Button
+                            onClick={scrollRight}
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 rounded-full transition-colors hover:bg-gray-100 hover:text-purple-700"
+                            aria-label="Scroll right"
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
 
-          <button
-            onClick={scrollRight}
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full p-2 shadow-md z-10"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
+                <div className="relative mx-auto pb-2">
+                    <div
+                        className="hide-scrollbar flex items-center gap-3 overflow-x-auto scroll-smooth pb-4"
+                        ref={scrollContainerRef}
+                        style={{
+                            scrollbarWidth: "none",
+                            msOverflowStyle: "none",
+                        }}
+                    >
+                        {browseThemesData.categories.map((category) => (
+                            <Button
+                                key={category.id}
+                                onClick={() => setActiveCategory(category.id)}
+                                variant={
+                                    activeCategory === category.id
+                                        ? "default"
+                                        : "outline"
+                                }
+                                className={`flex h-10 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 transition-all ${
+                                    activeCategory === category.id
+                                        ? "bg-purple-100 text-purple-700 hover:bg-purple-200 hover:text-purple-800"
+                                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                }`}
+                                size="sm"
+                            >
+                                <span className="inline-flex items-center justify-center text-lg">
+                                    {category.icon}
+                                </span>
+                                <span className="inline-block">
+                                    {category.name}
+                                </span>
+                            </Button>
+                        ))}
+                    </div>
+                </div>
 
-        <div className="mt-8 pt-8 border-t">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-            {themeSubcategories[activeCategory]?.map((subcategory, index) => (
-              <Link
-                key={index}
-                href={`/themes/${activeCategory}/${subcategory.toLowerCase().replace(/\s+/g, "-")}`}
-                className="text-gray-700 hover:text-purple-700 py-2 flex items-center gap-2"
-              >
-                <span>{subcategory}</span>
-              </Link>
-            ))}
-          </div>
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        className="mt-8 border-t pt-8"
+                        key={activeCategory}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        <div className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                            {browseThemesData.subcategories[
+                                activeCategory
+                            ]?.map((subcategory, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{
+                                        duration: 0.2,
+                                        delay: index * 0.03,
+                                    }}
+                                >
+                                    <Link
+                                        href={`/themes/${activeCategory}/${subcategory.toLowerCase().replace(/\s+/g, "-")}`}
+                                        className="group flex items-center gap-2 py-2 text-gray-700 transition-colors hover:text-purple-700"
+                                    >
+                                        <span className="font-medium transition-transform group-hover:translate-x-1">
+                                            {subcategory}
+                                        </span>
+                                    </Link>
+                                </motion.div>
+                            ))}
+                        </div>
 
-          <div className="mt-6">
-            <Link href={`/themes/${activeCategory}`} className="text-sm text-purple-700 hover:underline">
-              View all {themeCategories.find((c) => c.id === activeCategory)?.name}
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
+                        <div className="mt-8">
+                            <Link
+                                href={`/themes/${activeCategory}`}
+                                className="group inline-flex items-center text-sm font-medium text-purple-700 transition-colors hover:text-purple-800 hover:underline"
+                            >
+                                View all{" "}
+                                {
+                                    browseThemesData.categories.find(
+                                        (c) => c.id === activeCategory,
+                                    )?.name
+                                }
+                                <ChevronRight className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+                            </Link>
+                        </div>
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+        </section>
+    );
 }
-
